@@ -45,7 +45,9 @@ EventHubProducerAsyncClient producer;
 
   void sendMessage_test()
   {
-        String text="I am sending some databatch";        
+        String text="I am sending some databatch";   
+        
+        
         Mono<EvenDataBatch> dataBatch=Mono.empty(); 
         doReturn(dataBatch).when(producer).createBatch();
         asyncListener.sendMessage(msg);
@@ -54,6 +56,14 @@ EventHubProducerAsyncClient producer;
         
         //i need one act and assert statement to check is when i tryAdd(something) it should return false, coz above statement always executes in all the situations empty/exception/
         //i am unable to fugureout or may be i don't know the connected statements producer.createBatch().flatMap() where before invoking producer.createBatch() i have to mock flatmap with if and else statements
+       
+       //when i tried to add something like this 
+        final EventData test=new EventData(text)
+        Mono<Void> value=Mono.error(new NullpointerException());
+        
+         when(producer.send(text)).thenReturn(value);
+         
+         //it is failing as the method send(eventData) fron the the type EventHubProcuderAsyncClient is not visible
         
   
   }
