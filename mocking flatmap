@@ -1,0 +1,62 @@
+class AsyncListener
+{
+
+@Autowired
+EventHubProducerAsyncClient producer;
+
+
+public void sendMessage(Message message)
+{
+  try{
+  
+  if(message!=null)
+   String msg=message.toString();
+   
+   producer.createBatch().flatMap(batch -> {
+     batch.tryAdd(new EventData(msg));     
+     return producer.send(batch);
+ }).subscribe(unused -> { },
+     error -> System.err.println("Error occurred while sending batch:" + error),
+     () -> System.out.println("Send complete."));
+  
+  
+  }
+  catch(Exception e)
+  {
+   log.error(e.getMessage());   
+  }
+
+
+}
+
+
+}
+
+
+@ExtendWith(SpringExtension.class)
+class asyncListnerTest{
+
+@InjectMocks
+AsyncListener asyncListener;
+
+@Mock
+EventHubProducerAsyncClient producer;
+
+
+  void sendMessage_test()
+  {
+        String text="I am sending some databatch";        
+        Mono<EvenDataBatch> dataBatch=Mono.empty(); 
+        doReturn(dataBatch).when(producer).createBatch();
+        asyncListener.sendMessage(msg);
+        verfiy(producer,times(1)).createBatch();
+        
+        
+        //i need one act and assert statement to check is when i tryAdd(something) it should return false, coz above statement always executes in all the situations empty/exception/
+        //i am unable to fugureout or may be i don't know the connected statements producer.createBatch().flatMap() where before invoking producer.createBatch() i have to mock flatmap with if and else statements
+        
+  
+  }
+
+
+}
